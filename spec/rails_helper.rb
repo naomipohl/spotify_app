@@ -25,7 +25,7 @@ require 'webmock/rspec'
 
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
-ActiveRecord::Migration.maintain_test_schema!
+ActiveRecord::Migrator.migrate(File.join(Rails.root, 'db/migrate'))
 
 WebMock.disable_net_connect!(allow_localhost: true)
 
@@ -108,5 +108,8 @@ RSpec.configure do |config|
     allow(RSpotify::Track).to receive(:search).with('Invalid Song Chance The Rapper').and_return([])
 
     allow(RSpotify::Track).to receive(:search).with('').and_return(nil)
+    allow(RSpotify::Track).to receive(:search).with(' ').and_return(nil)
+    allow(RSpotify::Track).to receive(:search).with('Chance The Rapper ').and_return(nil)
+    allow(RSpotify::Track).to receive(:search).with(' Chance The Rapper').and_return(nil)
   end
 end

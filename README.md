@@ -12,7 +12,7 @@ In this homework, you will implement a Spotify Jukebox that interacts with the <
 
 ## Spotify API & RSpotify Gem
 The <a href="https://developer.spotify.com/web-api/tutorial/" target="_blank">Spotify Web API Tutorial</a> will walk you through getting set up with the API, but I've provided the basic steps below.
-1. You will need a Spotify user account, it does not matter if it is Premium or Free. If you don't already have one, you can sign up at<a href="https://www.spotify.com" target="_blank">www.spotify.com</a>.
+1. You will need a Spotify user account, it does not matter if it is Premium or Free. If you don't already have one, you can sign up at <a href="https://www.spotify.com" target="_blank">www.spotify.com</a>.
 2. You will then have to register with Spotify Developer. To do this, go to the <a href="https://developer.spotify.com/my-applications" target="_blank">My Applications</a> page at the Spotify Developer website and log in if necessary. Complete all of the required steps
 3. Now register an application, go back to the <a href="https://developer.spotify.com/my-applications" target="_blank">My Applications</a> page and click **Create a new application**.
 4. Enter the name of the application ('Spotify Jukebox' or something similar) and click **Create**.
@@ -21,8 +21,8 @@ The <a href="https://developer.spotify.com/web-api/tutorial/" target="_blank">Sp
 Now that you've registered your application, you will have to add your new keys to the app. As a general rule, you should always keep your API keys private. This section will walk you through setting your keys up using Rails secrets and the <a href="https://github.com/bkeepers/dotenv" target="_blank">dotenv gem</a>.
 1. Open `config/secrets.yml` and add the following lines under `base`:
    ```yaml
-   secret_client_id: <%= ENV['SPOTIFY_CLIENT_ID'] %>
-   secret_client_secret: <%= ENV['SPOTIFY_CLIENT_SECRET'] %>
+   spotify_client_id: <%= ENV['SPOTIFY_CLIENT_ID'] %>
+   spotify_client_secret: <%= ENV['SPOTIFY_CLIENT_SECRET'] %>
    ```
 2. The above lines tell your application to read your client id and client secret from your environment variables. You'll notice that development, test, and production all inherit from `base`.
 3. When you're writing your assignment, you will be working in the development environment. So let's set the environment variables for development. Create a file called `.env` in the root of your application and immediately add it to your <a href="https://git-scm.com/docs/gitignore" target="_blank">.gitignore</a> file. Since this file will contain your Spotify keys, you want to make sure that it doesn't get added to your GitHub repository.
@@ -38,10 +38,10 @@ Let's now set up the <a href="https://github.com/guilhermesad/rspotify" target="
 2. Open up `config/application.rb` and add the following:
     ```ruby
     unless Rails.env.test?
-       RSpotify::authenticate(Rails.application.secrets.spotify_client_id, Rails.application.spotify_client_secret)
+       RSpotify::authenticate(Rails.application.secrets.spotify_client_id, Rails.application.secrets.spotify_client_secret)
    end
    ```
-4. The above line will authenticate with RSpotify when you run the application. If all went well, you will now be able to start using RSpotify.
+3. The above line will authenticate with RSpotify when you run the application. If all went well, you will now be able to start using RSpotify. To test that it worked, you can start a rails console (by running `rails c`) and enter `RSpotify::Artist.search('Drake')[0]`. It should return a Ruby object. If instead you get an error, you likely missed a step in the setup.
 
 ## Migrations
 The migrations will be provided intact, run `rails db:create` and `rails db:migrate` to run the existing migrations.<br>
@@ -65,14 +65,14 @@ You should also add a custom validation that checks if the artist's `name` is pr
 Immediately return `nil` if the artist is not valid (you can use the `valid?` method here). Call `artist_search` and get the first element from the array that it returns. Call the <a href="http://www.rubydoc.info/github/guilhermesad/rspotify/master/RSpotify/Artist#related_artists-instance_method" target="_blank">`related_artists` method</a> on this element. `related_artists` will return an array of Ruby objects and each of those Ruby objects will have a name attribute. Map this array of Ruby objects to an array with just the names of each object (you can use the <a href="https://ruby-doc.org/core-2.4.1/Array.html#method-i-map" target="_blank">`map` method</a> here). Return the resulting array of just string names.
 
 #### #top_tracks
-Immediately return `nil` if the artist is not valid. Call `artist_search` and get the first element from the array that it returns. Call the <a href="http://www.rubydoc.info/github/guilhermesad/rspotify/master/RSpotify/Artist#top_tracks-instance_method" target="_blank">`top_tracks` method</a> with the argument `:US` on this element. Map this array of Ruby objects to an array with just the names of each object. Furthermore, if a name contains a `(`, you should remove it and everything that follows in the string. Be sure to strip and remaining whitespace once this step is complete. Return the resulting array.
+Immediately return `nil` if the artist is not valid. Call `artist_search` and get the first element from the array that it returns. Call the <a href="http://www.rubydoc.info/github/guilhermesad/rspotify/master/RSpotify/Artist#top_tracks-instance_method" target="_blank">`top_tracks` method</a> with the argument `:US` on this element. Map this array of Ruby objects to an array with just the names of each object. Furthermore, if a name contains a `(`, you should remove it and everything that follows in the string. Be sure to strip any remaining whitespace once this step is complete. Return the resulting array.
 
 ### Song
 #### #song_search
 This method will query RSpotify's track search and return an array containing all of the tracks that match the search term. To do this, you should use the <a href="http://www.rubydoc.info/github/guilhermesad/rspotify/master/RSpotify/Track#search-class_method" target="_blank">`RSpotify::Track.search` method</a>, pass it a space-separated string containing the song's artist's `name` and the song's `name`, and return the array that gets returned.
 
 #### Validations
-You should validate the presence of the `name` and the uniqueness of the `name` in the scope of the artist.<br>
+You should validate the presence of the `name` and the uniqueness of the `name` in the scope of the `artist`.<br>
 You should also define a custom validation that checks if the track is present in the Spotify API database. Inside of the custom validation, you should immediately return if the artist is nil, the artist's `name` is blank or if the song's `name` is blank. If the array returned by the `song_search` method is empty, you should add an error to `:base` with the text `'Must be a valid song for the artist in Spotify'`).
 
 #### #spotify_uri
@@ -99,10 +99,12 @@ We want to be able to add songs when we are creating a new artist. To do this, u
 #### \_form
 Change the first line of the form to accept an array containing `[artist, song]` instead of just song.
 
-## Deploy to Heroku
-Deploy your assignment to Heroku! Name the app 'cis196-17f-hw7-github_username' (be sure to replace github_username with your actual GitHub username). If you end up calling it anything else, let your TA know by sending them a quick email (otherwise they won't be able to find it and you'll lose all points for it). <a href="https://guides.railsapps.org/rails-deploy-to-heroku.html" target="_blank">This guide</a> is incredible and has a step-by-step walkthrough that explains how to deploy your app. Please read everything below before starting the guide.
+At this point, I would run `rspec` and `rubocop` to make sure that you are passing all tests. You can do your first submission here if you'd like, you won't be making a lot of additional significant changes.
 
-We will not be grading it for correctness, you will receive full credit for this part as long as the app is deployed and functioning (it's okay if we run into a few errors while executing).
+## Deploy to Heroku
+Deploy your assignment to Heroku! Name the app 'cis196-2017f-hw8-github_username' (be sure to replace github_username with your actual GitHub username). If you end up calling it anything else, let your TA know by sending them a quick email (otherwise they won't be able to find it and you'll lose all points for it). <a href="https://guides.railsapps.org/rails-deploy-to-heroku.html" target="_blank">This guide</a> is incredible and has a step-by-step walkthrough that explains how to deploy your app. Please read everything below before starting the guide.
+
+We will not be grading your Heroku deployment for correctness, you will receive full credit for this part as long as the app is deployed and functioning (it's okay if we run into a few errors while executing).
 
 While deploying, there is a step that involves setting heroku environment vairables. When you get to this step, you want to be sure to set `heroku config:add SPOTIFY_CLIENT_ID='YOUR SPOTIFY CLIENT ID'` and `heroku config:add SPOTIFY_CLIENT_SECRET='YOUR SPOTIFY CLIENT SECRET'` where the stuff between the quotes is replaced with your actual keys from a little while ago.
 

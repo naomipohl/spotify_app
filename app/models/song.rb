@@ -8,3 +8,4 @@ class Song < ApplicationRecord
 
   def song_search
   end
+end
