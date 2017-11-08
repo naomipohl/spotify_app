@@ -135,6 +135,7 @@ GEM
       omniauth (~> 1.2)
     parser (2.4.0.0)
       ast (~> 2.2)
+    pg (0.21.0)
     popper_js (1.12.5)
     powerpack (0.1.1)
     pry (0.10.4)
@@ -274,6 +275,7 @@ DEPENDENCIES
   jbuilder (= 2.7.0)
   jquery-rails (= 4.3.1)
   listen (= 3.0.8)
+  pg
   pry (= 0.10.4)
   puma (= 3.10.0)
   rails (= 5.0.3)
@@ -289,6 +291,9 @@ DEPENDENCIES
   uglifier (= 3.2.0)
   web-console (= 3.5.1)
   webmock (= 3.1.0)
+
+RUBY VERSION
+   ruby 2.4.0p0
 
 BUNDLED WITH
    1.16.0.pre.3

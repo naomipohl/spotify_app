@@ -1,10 +1,8 @@
 source 'https://rubygems.org'
 
-# TODO: Specify the Ruby version (2.4.1)
+ruby '2.4.0'
 
 gem 'rails', '5.0.3'
-# TODO: Move sqlite gem to the development group
-gem 'sqlite3', '1.3.13'
 gem 'puma', '3.10.0'
 gem 'sass-rails', '5.0.6'
 gem 'uglifier', '3.2.0'
@@ -15,10 +13,13 @@ gem 'jbuilder', '2.7.0'
 gem 'rspotify', '1.24.0'
 gem 'bootstrap', '~> 4.0.0.beta'
 
-# TODO: Add a production group and add the pg gem
+group :production do
+  gem 'pg'
+end
 
 group :development, :test do
   gem 'dotenv-rails', '2.2.1'
+  gem 'sqlite3', '1.3.13'
   gem 'byebug', '9.0.6', platform: :mri
   gem 'pry', '0.10.4'
   gem 'rspec-rails', '3.6.0'
